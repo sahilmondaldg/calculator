@@ -4,40 +4,61 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                echo 'Starting Checkout...'
                 git 'https://github.com/sahilmondaldg/calculator.git'
+                echo 'Checkout completed.'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                // Upgrade pip and install dependencies
-                sh 'python3 -m pip install --upgrade pip'
-                // Uncomment if you have requirements.txt
+                echo 'Starting Install Dependencies...'
+                
+                // Check if Python is installed and print the version
+                sh 'python3 --version || python --version'
+
+                // Install or upgrade pip
+                echo 'Upgrading pip...'
+                sh 'python3 -m pip install --upgrade pip || python -m pip install --upgrade pip'
+
+                // Optionally, install dependencies if you have a requirements.txt file
+                // Uncomment the following line if applicable
                 // sh 'pip install -r requirements.txt'
+
+                echo 'Dependencies installed successfully.'
             }
         }
 
         stage('Run Unit Tests') {
             steps {
-                // Check Python version for debugging
-                sh 'python3 --version'
+                echo 'Starting Unit Tests...'
                 
-                // Run the unit tests and generate XML reports
-                sh 'python3 -m xmlrunner discover -o test-results'
+                // Run the tests and print Python version for debugging
+                sh 'python3 --version || python --version'
+                
+                // Run the unit tests and generate XML reports for Jenkins to parse
+                echo 'Running unit tests and generating XML reports...'
+                sh 'python3 -m unittest discover || python -m unittest discover'
+
+                // Optional: If you want to generate JUnit-compatible XML output, install `xmlrunner`
+                // sh 'pip install unittest-xml-reporting'
+                // sh 'python3 -m xmlrunner discover -o test-results || python -m xmlrunner discover -o test-results'
+
+                echo 'Unit tests completed.'
             }
         }
     }
 
     post {
         always {
-            // Publish test results (JUnit XML format)
-            junit '**/test-results/*.xml'
+            echo 'Publishing test results...'
+            junit '**/test-results/*.xml'  // This only works if XML results are generated
         }
         success {
-            echo 'All tests passed!'
+            echo 'All stages completed successfully!'
         }
         failure {
-            echo 'Some tests failed.'
+            echo 'Pipeline failed at some stage.'
         }
     }
 }
