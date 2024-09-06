@@ -21,9 +21,14 @@ pipeline {
                 echo 'Upgrading pip...'
                 bat 'python -m pip install --upgrade pip'
 
-                // Optionally, install dependencies if you have a requirements.txt file
-                // Uncomment the following line if applicable
-                // sh 'pip install -r requirements.txt'
+                // Install dependencies from requirements.txt (if present)
+                bat '''
+                if exist requirements.txt (
+                    python -m pip install -r requirements.txt
+                ) else (
+                    echo No requirements.txt found, skipping dependency installation.
+                )
+                '''
 
                 echo 'Dependencies installed successfully.'
             }
@@ -38,11 +43,13 @@ pipeline {
                 
                 // Run the unit tests and generate XML reports for Jenkins to parse
                 echo 'Running unit tests and generating XML reports...'
-                bat 'python -m unittest discover'
+                bat 'python -m unittest discover > test_results.log'
 
-                // Optional: If you want to generate JUnit-compatible XML output, install `xmlrunner`
-                // sh 'pip install unittest-xml-reporting'
-                // sh 'python3 -m xmlrunner discover -o test-results || python -m xmlrunner discover -o test-results'
+                // Optional: If you want to generate JUnit-compatible XML output
+                bat '''
+                python -m pip install unittest-xml-reporting
+                python -m xmlrunner discover -o test-results
+                '''
 
                 echo 'Unit tests completed.'
             }
@@ -52,7 +59,9 @@ pipeline {
     post {
         always {
             echo 'Publishing test results...'
-            junit '**/test-results/*.xml'  // This only works if XML results are generated
+            
+            // Publish JUnit test results if XML results are generated
+            junit 'test-results/*.xml'  // Adjust the path if needed
         }
         success {
             echo 'All stages completed successfully!'
