@@ -15,11 +15,11 @@ pipeline {
                 echo 'Starting Install Dependencies...'
                 
                 // Check if Python is installed and print the version
-                bat 'python3 --version || python --version'
+                bat 'python --version'
 
                 // Install or upgrade pip
                 echo 'Upgrading pip...'
-                bat 'python3 -m pip install --upgrade pip || python -m pip install --upgrade pip'
+                bat 'python -m pip install --upgrade pip'
 
                 // Optionally, install dependencies if you have a requirements.txt file
                 // Uncomment the following line if applicable
@@ -34,11 +34,11 @@ pipeline {
                 echo 'Starting Unit Tests...'
                 
                 // Run the tests and print Python version for debugging
-                bat 'python3 --version || python --version'
+                bat 'python --version'
                 
                 // Run the unit tests and generate XML reports for Jenkins to parse
                 echo 'Running unit tests and generating XML reports...'
-                bat 'python3 -m unittest discover || python -m unittest discover'
+                bat 'python -m unittest discover'
 
                 // Optional: If you want to generate JUnit-compatible XML output, install `xmlrunner`
                 // sh 'pip install unittest-xml-reporting'
