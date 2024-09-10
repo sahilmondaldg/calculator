@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.10' // Specify the Python Docker image version
+            args '-u root'      // Optional: Run as root to avoid permission issues
+        }
+    }
 
     stages {
         stage('Checkout') {
@@ -15,19 +20,19 @@ pipeline {
                 echo 'Starting Install Dependencies...'
                 
                 // Check if Python is installed and print the version
-                bat 'python --version'
+                sh 'python --version'
 
                 // Install or upgrade pip
                 echo 'Upgrading pip...'
-                bat 'python -m pip install --upgrade pip'
+                sh 'python -m pip install --upgrade pip'
 
                 // Install dependencies from requirements.txt (if present)
-                bat '''
-                if exist requirements.txt (
+                sh '''
+                if [ -f requirements.txt ]; then
                     python -m pip install -r requirements.txt
-                ) else (
-                    echo No requirements.txt found, skipping dependency installation.
-                )
+                else
+                    echo "No requirements.txt found, skipping dependency installation."
+                fi
                 '''
 
                 echo 'Dependencies installed successfully.'
@@ -39,14 +44,14 @@ pipeline {
                 echo 'Starting Unit Tests...'
                 
                 // Run the tests and print Python version for debugging
-                bat 'python --version'
+                sh 'python --version'
                 
-                // Run the unit tests and generate XML reports for Jenkins to parse
+                // Run the unit tests and generate a log file
                 echo 'Running unit tests and generating XML reports...'
-                bat 'python -m unittest discover > test_results.log'
+                sh 'python -m unittest discover > test_results.log'
 
-                // Optional: If you want to generate JUnit-compatible XML output
-                bat '''
+                // Optional: Generate JUnit-compatible XML output
+                sh '''
                 python -m pip install unittest-xml-reporting
                 python -m xmlrunner discover -o test-results
                 '''
