@@ -60,21 +60,4 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            echo 'Publishing test results...'
-
-            // Print the directory structure to verify that test results are present
-            sh 'ls -R'
-
-            // Publish JUnit test results if XML results are generated
-            junit 'test-results/*.xml'  // Adjust the path if needed
-        }
-        success {
-            echo 'All stages completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed at some stage.'
-        }
-    }
 }
