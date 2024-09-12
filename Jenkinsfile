@@ -1,11 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.8'
-            args '-v C:/ProgramData/Jenkins/.jenkins/workspace/pipe3:/workspace'
-            reuseNode true
-        }
-    }
+    agent any
 
     stages {
         stage('Checkout') {
@@ -16,11 +10,18 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Build and Test') {
+            agent {
+                docker {
+                    image 'python:3.8'
+                    args '-v %CD%:C:\\workspace'
+                    reuseNode true
+                }
+            }
             steps {
-                echo 'Starting Install Dependencies...'
+                echo 'Starting Build and Test...'
                 bat 'python --version'
-                echo 'Upgrading pip...'
+                bat 'dir'
                 bat 'python -m pip install --upgrade pip'
                 bat '''
                 if exist requirements.txt (
@@ -29,23 +30,14 @@ pipeline {
                     echo No requirements.txt found, skipping dependency installation.
                 )
                 '''
-                echo 'Dependencies installed successfully.'
-            }
-        }
-
-        stage('Run Unit Tests') {
-            steps {
-                echo 'Starting Unit Tests...'
-                bat 'python --version'
-                echo 'Running unit tests and generating log...'
-                bat 'python -m unittest discover > test_results.log'
-                echo 'Generating JUnit-compatible XML reports...'
+                bat 'python -m unittest discover'
                 bat '''
                 python -m pip install unittest-xml-reporting
                 python -m xmlrunner discover -o test-results
                 '''
-                echo 'Unit tests completed.'
+                echo 'Build and Test completed.'
             }
         }
     }
+
 }
