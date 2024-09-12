@@ -2,7 +2,8 @@ pipeline {
     agent {
         docker {
             image 'python:3.11'
-            args '-u root'
+            args '-u root -v /c/ProgramData/Jenkins/.jenkins/workspace/pipe3:/workspace'
+            // Note: Update the volume mapping as needed
         }
     }
 
@@ -18,15 +19,9 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 echo 'Starting Install Dependencies...'
-
-                // Check if Python is installed and print the version
                 sh 'python --version'
-
-                // Install or upgrade pip
                 echo 'Upgrading pip...'
                 sh 'python -m pip install --upgrade pip'
-
-                // Install dependencies from requirements.txt (if present)
                 sh '''
                 if [ -f requirements.txt ]; then
                     python -m pip install -r requirements.txt
@@ -41,15 +36,9 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 echo 'Starting Unit Tests...'
-
-                // Print Python version for debugging
                 sh 'python --version'
-
-                // Run the unit tests and generate a log file
                 echo 'Running unit tests and generating log...'
                 sh 'python -m unittest discover | tee test_results.log'
-
-                // Install the unittest-xml-reporting library and generate XML test reports
                 echo 'Generating JUnit-compatible XML reports...'
                 sh '''
                 python -m pip install unittest-xml-reporting
@@ -59,5 +48,4 @@ pipeline {
             }
         }
     }
-
 }
