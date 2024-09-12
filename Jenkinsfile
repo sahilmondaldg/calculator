@@ -1,9 +1,9 @@
 pipeline {
     agent {
         docker {
-            image 'python:3.11'
+            image 'python:3.8'
             args '-u root -v /c/ProgramData/Jenkins/.jenkins/workspace/pipe3:/workspace'
-            // Note: Update the volume mapping as needed
+            // Adjust the volume mapping as needed
         }
     }
 
@@ -48,4 +48,6 @@ pipeline {
             }
         }
     }
+
+    
 }
