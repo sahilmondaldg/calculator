@@ -1,8 +1,8 @@
 pipeline {
     agent {
         docker {
-            image 'python:3.11' // Specify the Python Docker image version
-            args '-u root'           // Optional: Run as root to avoid permission issues
+            image 'python:3.11'
+            args '-u root'
         }
     }
 
@@ -20,19 +20,19 @@ pipeline {
                 echo 'Starting Install Dependencies...'
 
                 // Check if Python is installed and print the version
-                bat 'python --version'
+                sh 'python --version'
 
                 // Install or upgrade pip
                 echo 'Upgrading pip...'
-                bat 'python -m pip install --upgrade pip'
+                sh 'python -m pip install --upgrade pip'
 
                 // Install dependencies from requirements.txt (if present)
-                bat '''
-                if exist requirements.txt (
+                sh '''
+                if [ -f requirements.txt ]; then
                     python -m pip install -r requirements.txt
-                ) else (
+                else
                     echo "No requirements.txt found, skipping dependency installation."
-                )
+                fi
                 '''
                 echo 'Dependencies installed successfully.'
             }
@@ -43,15 +43,15 @@ pipeline {
                 echo 'Starting Unit Tests...'
 
                 // Print Python version for debugging
-                bat 'python --version'
+                sh 'python --version'
 
                 // Run the unit tests and generate a log file
-                echo 'Running unit tests and generating XML reports...'
-                bat 'python -m unittest discover > test_results.log'
-                bat 'type test_results.log'  // Print the test results log
+                echo 'Running unit tests and generating log...'
+                sh 'python -m unittest discover | tee test_results.log'
 
-                // Optional: Generate JUnit-compatible XML output
-                bat '''
+                // Install the unittest-xml-reporting library and generate XML test reports
+                echo 'Generating JUnit-compatible XML reports...'
+                sh '''
                 python -m pip install unittest-xml-reporting
                 python -m xmlrunner discover -o test-results
                 '''
@@ -65,10 +65,10 @@ pipeline {
             echo 'Publishing test results...'
 
             // Print the directory structure to verify that test results are present
-            bat 'dir /S'
+            sh 'ls -R'
 
             // Publish JUnit test results if XML results are generated
-            junit 'test-results\\*.xml'  // Adjust the path if needed
+            junit 'test-results/*.xml'  // Adjust the path if needed
         }
         success {
             echo 'All stages completed successfully!'
