@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'python:3.12-slim' // Specify the Python Docker image version
+            image 'python:3.11' // Specify the Python Docker image version
             args '-u root'           // Optional: Run as root to avoid permission issues
         }
     }
