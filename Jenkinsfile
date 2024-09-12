@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'python:3.8'
-            args '-u root -v /c/ProgramData/Jenkins/.jenkins/workspace/pipe3:/workspace'
+            args '-v /var/jenkins_home/workspace/pipe3:/workspace'
         }
     }
 
@@ -48,5 +48,4 @@ pipeline {
         }
     }
 
-    
 }
