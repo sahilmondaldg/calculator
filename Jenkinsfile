@@ -1,16 +1,12 @@
 pipeline {
-    agent any
-    stages {
-
-        stage('Build'){
-            agent {
-                docker {
-                    image 'python:3.11'
-                    args '-u root'
-                }
-            }
+    agent {
+        docker {
+            image 'python:3.11'
+            args '-u root'
         }
+    }
 
+    stages {
         stage('Checkout') {
             steps {
                 echo 'Starting Checkout...'
