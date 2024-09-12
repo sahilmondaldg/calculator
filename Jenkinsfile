@@ -48,17 +48,5 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            echo 'Publishing test results...'
-            sh 'ls -R /workspace'
-            junit 'test-results/*.xml'
-        }
-        success {
-            echo 'All stages completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed at some stage.'
-        }
-    }
+    
 }
