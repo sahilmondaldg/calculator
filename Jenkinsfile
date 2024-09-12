@@ -3,7 +3,6 @@ pipeline {
         docker {
             image 'python:3.8'
             args '-u root -v /c/ProgramData/Jenkins/.jenkins/workspace/pipe3:/workspace'
-            // Adjust the volume mapping as needed
         }
     }
 
@@ -49,5 +48,17 @@ pipeline {
         }
     }
 
-    
+    post {
+        always {
+            echo 'Publishing test results...'
+            sh 'ls -R /workspace'
+            junit 'test-results/*.xml'
+        }
+        success {
+            echo 'All stages completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed at some stage.'
+        }
+    }
 }
