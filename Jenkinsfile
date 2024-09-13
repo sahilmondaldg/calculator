@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'python:3.11'  // You can change this to a specific Python version if needed
-            args '/mnt/c/ProgramData/Jenkins/.jenkins/workspace/pipe3/'
+            args '/mnt/c/programdata/jenkins/.jenkins/workspace/pipe3/'
         }
     }
 
