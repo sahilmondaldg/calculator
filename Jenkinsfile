@@ -13,22 +13,22 @@ pipeline {
         stage('Setup Python') {
             steps {
                 echo 'Setting up Python environment...'
-                bat 'python --version'
-                bat 'python -m venv venv'
-                bat 'venv\\Scripts\\activate.bat'
+                sh 'python3 --version'
+                sh 'python3 -m venv venv'
+                sh '. venv/bin/activate'
             }
         }
 
         stage('Install Dependencies') {
             steps {
                 echo 'Starting Install Dependencies...'
-                bat 'python -m pip install --upgrade pip'
-                bat '''
-                if exist requirements.txt (
-                    python -m pip install -r requirements.txt
-                ) else (
-                    echo No requirements.txt found, skipping dependency installation.
-                )
+                sh 'python3 -m pip install --upgrade pip'
+                sh '''
+                if [ -f requirements.txt ]; then
+                    python3 -m pip install -r requirements.txt
+                else
+                    echo "No requirements.txt found, skipping dependency installation."
+                fi
                 '''
                 echo 'Dependencies installed successfully.'
             }
@@ -37,11 +37,11 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 echo 'Starting Unit Tests...'
-                bat 'python -m unittest discover > test_results.log'
+                sh 'python3 -m unittest discover | tee test_results.log'
                 echo 'Generating JUnit-compatible XML reports...'
-                bat '''
-                python -m pip install unittest-xml-reporting
-                python -m xmlrunner discover -o test-results
+                sh '''
+                python3 -m pip install unittest-xml-reporting
+                python3 -m xmlrunner discover -o test-results
                 '''
                 echo 'Unit tests completed.'
             }
