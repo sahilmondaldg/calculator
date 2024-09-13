@@ -1,12 +1,21 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.8'
-            args '-u root -v /c/ProgramData/Jenkins/.jenkins/workspace/pipe3:/workspace'
-        }
-    }
+    agent any
 
     stages {
+        stage('Build') {
+            agent {
+                docker {
+                    image 'python:3.8'
+                    args '-u root -v /c/ProgramData/Jenkins/.jenkins/workspace/pipe3:/workspace'
+                }
+            }
+            steps {
+                echo 'Starting Build...'
+                sh 'python --version'
+                echo 'Build stage completed.'
+            }
+        }
+
         stage('Checkout') {
             steps {
                 echo 'Starting Checkout...'
@@ -16,6 +25,12 @@ pipeline {
         }
 
         stage('Install Dependencies') {
+            agent {
+                docker {
+                    image 'python:3.8'
+                    args '-u root -v /c/ProgramData/Jenkins/.jenkins/workspace/pipe3:/workspace'
+                }
+            }
             steps {
                 echo 'Starting Install Dependencies...'
                 sh 'python --version'
@@ -33,6 +48,12 @@ pipeline {
         }
 
         stage('Run Unit Tests') {
+            agent {
+                docker {
+                    image 'python:3.8'
+                    args '-u root -v /c/ProgramData/Jenkins/.jenkins/workspace/pipe3:/workspace'
+                }
+            }
             steps {
                 echo 'Starting Unit Tests...'
                 sh 'python --version'
@@ -47,5 +68,4 @@ pipeline {
             }
         }
     }
-
 }
