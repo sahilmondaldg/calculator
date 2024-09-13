@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.8'
+            args '-u root -v /c/ProgramData/Jenkins/.jenkins/workspace/pipe3:/workspace'
+        }
+    }
 
     stages {
         stage('Checkout') {
@@ -10,32 +15,35 @@ pipeline {
             }
         }
 
-        stage('Build and Test') {
-            agent {
-                docker {
-                    image 'python:3.8'
-                    args '-v %CD%:C:\\workspace'
-                    reuseNode true
-                }
-            }
+        stage('Install Dependencies') {
             steps {
-                echo 'Starting Build and Test...'
-                bat 'python --version'
-                bat 'dir'
-                bat 'python -m pip install --upgrade pip'
-                bat '''
-                if exist requirements.txt (
+                echo 'Starting Install Dependencies...'
+                sh 'python --version'
+                echo 'Upgrading pip...'
+                sh 'python -m pip install --upgrade pip'
+                sh '''
+                if [ -f requirements.txt ]; then
                     python -m pip install -r requirements.txt
-                ) else (
-                    echo No requirements.txt found, skipping dependency installation.
-                )
+                else
+                    echo "No requirements.txt found, skipping dependency installation."
+                fi
                 '''
-                bat 'python -m unittest discover'
-                bat '''
+                echo 'Dependencies installed successfully.'
+            }
+        }
+
+        stage('Run Unit Tests') {
+            steps {
+                echo 'Starting Unit Tests...'
+                sh 'python --version'
+                echo 'Running unit tests and generating log...'
+                sh 'python -m unittest discover | tee test_results.log'
+                echo 'Generating JUnit-compatible XML reports...'
+                sh '''
                 python -m pip install unittest-xml-reporting
                 python -m xmlrunner discover -o test-results
                 '''
-                echo 'Build and Test completed.'
+                echo 'Unit tests completed.'
             }
         }
     }
